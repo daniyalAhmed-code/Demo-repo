@@ -36,8 +36,6 @@ jobs:
           git cherry-pick FETCH_HEAD
 
           # Push the changes to the Release branch
-          git remote set-url origin https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/daniyalAhmed-code/Demo-repo.git
-
           git push origin Released
 
       - name: Comment on the PR
