@@ -34,7 +34,7 @@ jobs:
           git cherry-pick FETCH_HEAD
 
           # Push the changes to the Release branch
-          git push origin release
+          git push origin Released
 
       - name: Comment on the PR
         run: |
