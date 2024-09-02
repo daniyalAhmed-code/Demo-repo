@@ -30,7 +30,7 @@ jobs:
           git fetch origin pull/$PR_NUMBER/head
 
           # Cherry-pick the commits onto the Release branch
-          git checkout release
+          git checkout Released
           git cherry-pick FETCH_HEAD
 
           # Push the changes to the Release branch
