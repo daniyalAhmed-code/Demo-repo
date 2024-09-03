@@ -27,13 +27,17 @@ jobs:
         run: |
           # Get the PR number
           PR_NUMBER=$(echo ${{ github.event.pull_request.number }})
+
+          TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
           
+          git fetch origin $TARGET_BRANCH
           # Fetch the PR commits
           git fetch origin pull/$PR_NUMBER/head
 
           # Cherry-pick the commits onto the Release branch
           git checkout Released
-          git cherry-pick FETCH_HEAD
+
+          git cherry-pick $TARGET_BRANCH..pr-branch
 
           # Push the changes to the Release branch
           git push origin Released
