@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   cherry-pick:
-    if: github.event.label.name == 'cherry-pick-to-release'
+    if: ${{ contains(github.event.label.name, 'released-') && github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Dev branch
@@ -18,33 +18,13 @@ jobs:
           ref: dev
           fetch-depth: 0  # Fetch all history so we can cherry-pick
 
-      - name: Configure Git
-        run: |
-          git config user.name "${{ github.actor }}"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-
-      - name: Cherry-Pick PR Commits
-        run: |
-          # Get the PR number
-          PR_NUMBER=$(echo ${{ github.event.pull_request.number }})
-
-          TARGET_BRANCH=${{ github.event.pull_request.base.ref }}
-          
-          git fetch origin $TARGET_BRANCH
-          # Fetch the PR commits
-          git fetch origin pull/$PR_NUMBER/head
-
-          # Cherry-pick the commits onto the Release branch
-          git checkout Released
-
-          git cherry-pick $TARGET_BRANCH..pr-branch
-
-          # Push the changes to the Release branch
-          git push origin Released
-
-      - name: Comment on the PR
-        run: |
-          PR_URL=${{ github.event.pull_request.html_url }}
-          echo "Cherry-picked the commits from PR $PR_URL to the release branch" 
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v3
+      - uses: carloscastrojumo/github-cherry-pick-action@v1.0.1
+        id: cherry-pick
+        with:
+          branch: ${{ github.event.label.name }}
+          force: true
+      - run: |
+            echo "${{ steps.cherry-pick }}"
+            echo "${{ steps.cherry-pick.outputs }}" 
+            echo "${{ toJSON(steps.cherry-pick.outputs) }}"
